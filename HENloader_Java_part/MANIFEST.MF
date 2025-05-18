@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: HENloader
+Created-By: BenNox_XD, Dr.Oid
+License: MIT; See the LICENSE file in the root of this repository

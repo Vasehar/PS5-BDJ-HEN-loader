@@ -1,0 +1,7 @@
+*.o
+*.elf
+*.bin
+._*
+.DS_Store
+*.jar
+HENloader_Java_part/HENloader.class
