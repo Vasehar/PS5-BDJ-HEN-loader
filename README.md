@@ -73,7 +73,7 @@ jar cfm HENloader.jar MANIFEST.MF *.class org/ps5jb/loader/*.class *.elf
 
 ### Credits
 
-* Huge thanks to [Dr.Oid](https://x.com/RepassyMate), the developer who made the original etaHEN.bin JAR sender, whose source is also used in this project. Without him, this would have been much more complicated.
+* Huge thanks to [Dr.Oid (X ](https://x.com/RepassyMate) [/ YouTube)](https://www.youtube.com/@Dr.Oid27), the developer who made the original etaHEN.bin JAR sender, whose source is also used in this project. Without him, this would have been much more complicated.
 * Big thanks to [Viktorious X](https://x.com/Viktorioussssss) for pointing out the initial problem, extensive testing, his general help, and for maintaining [the ISO](https://github.com/Viktorious-x/ps5-bdjb-modified-ISOs).
 
 Thanks to everyone else in the scene who made all of this possible in the first place:
