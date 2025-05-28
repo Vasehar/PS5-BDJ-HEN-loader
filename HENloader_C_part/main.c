@@ -139,9 +139,9 @@ int main() {
         return 1;
     }*/
 
-    if (etaHEN_filepath == NULL && kstuff_filepath == NULL) {
-        send_notification("No kstuff or etaHEN found - exiting");
-        printf("No kstuff or etaHEN found - exiting\n");
+    if (etaHEN_filepath == NULL) {
+        send_notification("No etaHEN found - exiting");
+        printf("No etaHEN found - exiting\n");
         return 1;
     }
 
