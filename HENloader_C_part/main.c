@@ -28,7 +28,7 @@ int port = 9021;
 
 const char *kstuff_1 = "/data/kstuff.elf";
 const char *kstuff_2 = "/mnt/usb0/kstuff.elf";
-const char *websrv = "/data/websrv.elf";
+const char *websrv = "/mnt/usb0/websrv.elf";
 const char *kstuff_filepath = NULL;
 const char *friendly_kstuff_filepath = NULL;
 bool kstuff_USB_or_data = false;
@@ -88,6 +88,22 @@ uint32_t get_app_id_by_command(const char *target_command) { // Largely based on
 }
 
 int main() {
+    
+    //websrv
+    send_notification("Made BY **Vasehar**");
+    if (access(websrv, F_OK) == 0) {
+        if (send_file(ip, port, websrv) == 0) {
+            printf("Sent websrv successfully.\n");
+            sleep(10)
+        } else {
+            printf("Failed to send websrv.\n");
+            send_notification("Failed to send websrv");
+            sleep(6)
+            return 1;
+        }
+    }
+    
+
     uint32_t app_id = get_app_id_by_command(target_process);
     char formatted[11];
   
@@ -101,18 +117,7 @@ int main() {
         return 1;
     }
 
-    //websrv
-    send_notification("Made BY **Vasehar**");
-    if (access(websrv, F_OK) == 0) {
-        if (send_file(ip, port, websrv) == 0) {
-            printf("Sent websrv successfully.\n");
-        } else {
-            printf("Failed to send websrv.\n");
-            send_notification("Failed to send websrv");
-            return 1;
-        }
-    }
-
+    
     // check file existence
     if (access(kstuff_1, F_OK) == 0) {
         kstuff_filepath = kstuff_1;
