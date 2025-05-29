@@ -94,11 +94,11 @@ int main() {
     if (access(websrv, F_OK) == 0) {
         if (send_file(ip, port, websrv) == 0) {
             printf("Sent websrv successfully.\n");
-            sleep(10)
+            sleep(10);
         } else {
             printf("Failed to send websrv.\n");
             send_notification("Failed to send websrv");
-            sleep(6)
+            sleep(6);
             return 1;
         }
     }
