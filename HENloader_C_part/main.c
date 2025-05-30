@@ -26,13 +26,11 @@ const char *target_process = "SceDiscPlayer";
 const char *ip = "127.0.0.1";
 int port = 9021;
 
-const char *kstuff_1 = "/data/kstuff.elf";
-const char *kstuff_2 = "/mnt/usb0/kstuff.elf";
-const char *websrv = "/mnt/usb0/websrv.elf";
-const char *kstuff_filepath = NULL;
-const char *friendly_kstuff_filepath = NULL;
-bool kstuff_USB_or_data = false;
-
+const char *etaHEN_1 = "/data/etaHEN.bin";
+const char *etaHEN_2 = "/mnt/usb0/etaHEN.bin";
+const char *etaHEN_3 = "/mnt/disc/jar-payloads/etaHEN.bin";
+const char *etaHEN_filepath = NULL;
+const char *friendly_etaHEN_filepath = NULL;
 
 typedef struct app_info {
     uint32_t app_id;
@@ -43,70 +41,54 @@ typedef struct app_info {
 } app_info_t;
 
 int sceLncUtilForceKillApp(int appId);
-  
 int sceKernelGetAppInfo(pid_t pid, app_info_t *info);
 
-uint32_t get_app_id_by_command(const char *target_command) { // Largely based on John Törnblom's ps paylod: https://github.com/ps5-payload-dev/sdk/blob/master/samples/ps/main.c
-  int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PROC, 0};
-  app_info_t appinfo;
-  size_t buf_size;
-  void *buf;
+uint32_t get_app_id_by_command(const char *target_command) {
+    int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PROC, 0};
+    app_info_t appinfo;
+    size_t buf_size;
+    void *buf;
 
-  if (sysctl(mib, 4, NULL, &buf_size, NULL, 0)) {
-    perror("sysctl size");
-    return 0;
-  }
+    if (sysctl(mib, 4, NULL, &buf_size, NULL, 0)) {
+        perror("sysctl size");
+        return 0;
+    }
 
-  if (!(buf = malloc(buf_size))) {
-    perror("malloc");
-    return 0;
-  }
+    if (!(buf = malloc(buf_size))) {
+        perror("malloc");
+        return 0;
+    }
 
-  if (sysctl(mib, 4, buf, &buf_size, NULL, 0)) {
-    perror("sysctl data");
-    free(buf);
-    return 0;
-  }
+    if (sysctl(mib, 4, buf, &buf_size, NULL, 0)) {
+        perror("sysctl data");
+        free(buf);
+        return 0;
+    }
 
-  for (void *ptr = buf; ptr < (buf + buf_size);) {
-    struct kinfo_proc *ki = (struct kinfo_proc *)ptr;
-    ptr += ki->ki_structsize;
+    for (void *ptr = buf; ptr < (buf + buf_size);) {
+        struct kinfo_proc *ki = (struct kinfo_proc *)ptr;
+        ptr += ki->ki_structsize;
 
-    if (strcmp(ki->ki_comm, target_command) != 0)
-      continue;
+        if (strcmp(ki->ki_comm, target_command) != 0)
+            continue;
 
-    if (sceKernelGetAppInfo(ki->ki_pid, &appinfo)) {
-      memset(&appinfo, 0, sizeof(appinfo));
+        if (sceKernelGetAppInfo(ki->ki_pid, &appinfo)) {
+            memset(&appinfo, 0, sizeof(appinfo));
+        }
+
+        free(buf);
+        return appinfo.app_id;
     }
 
     free(buf);
-    return appinfo.app_id;
-  }
-
-  free(buf);
-  return 0;
+    return 0;
 }
 
 int main() {
-    
-    //websrv
-    send_notification("Made BY **Vasehar**");
-    if (access(websrv, F_OK) == 0) {
-        if (send_file(ip, port, websrv) == 0) {
-            printf("Sent websrv successfully.\n");
-            sleep(10);
-        } else {
-            printf("Failed to send websrv.\n");
-            send_notification("Failed to send websrv");
-            sleep(6);
-            return 1;
-        }
-    }
-    
-
+    send_notification("Made By **VASEHAR**");
     uint32_t app_id = get_app_id_by_command(target_process);
     char formatted[11];
-  
+
     if (app_id) {
         snprintf(formatted, sizeof(formatted), "0x%08x", app_id);
         printf("AppId for %s: %04x\n", target_process, app_id);
@@ -117,32 +99,29 @@ int main() {
         return 1;
     }
 
-    
-    // check file existence
-    if (access(kstuff_1, F_OK) == 0) {
-        kstuff_filepath = kstuff_1;
-        friendly_kstuff_filepath = "/data";
-        kstuff_USB_or_data = true;
-    } else if (access(kstuff_2, F_OK) == 0) {
-        kstuff_filepath = kstuff_2;
-        friendly_kstuff_filepath = "USB";
-        kstuff_USB_or_data = true;
-    } 
-
-
-    if (kstuff_filepath == NULL) {
-        send_notification("No kstuff found - exiting");
-        printf("No kstuff found - exiting\n");
+    // Check for etaHEN.bin in the specified order
+    if (access(etaHEN_1, F_OK) == 0) {
+        etaHEN_filepath = etaHEN_1;
+        friendly_etaHEN_filepath = "/data";
+    } else if (access(etaHEN_2, F_OK) == 0) {
+        etaHEN_filepath = etaHEN_2;
+        friendly_etaHEN_filepath = "USB";
+    } else if (access(etaHEN_3, F_OK) == 0) {
+        etaHEN_filepath = etaHEN_3;
+        friendly_etaHEN_filepath = "Disc";
+    } else {
+        send_notification("No etaHEN found - exiting");
+        printf("No etaHEN found - exiting\n");
         return 1;
-    } else if (kstuff_filepath != NULL) { // kstuff only ->  
-        send_notification("kstuff will be loaded from %s", friendly_kstuff_filepath);
-        printf("kstuff will be loaded from %s\n", kstuff_filepath);
-    } 
+    }
+
+    send_notification("etaHEN will be loaded from %s", friendly_etaHEN_filepath);
+    printf("etaHEN will be loaded from %s\n", etaHEN_filepath);
 
     printf("Attempting to kill %s...\n", target_process);
     send_notification("Attempting to kill DiscPlayer");
 
-    usleep(1750000); //1.75sec
+    usleep(1750000); // 1.75 seconds
 
     int APP_ID = (int)strtol(formatted, NULL, 16);
     int result = sceLncUtilForceKillApp(APP_ID);
@@ -151,20 +130,17 @@ int main() {
         send_notification("Failed to kill DiscPlayer - aborting");
         return 1;
     }
-    printf("Successfully killed %s", target_process);
+    printf("Successfully killed %s\n", target_process);
     send_notification("Successfully killed DiscPlayer");
 
-
-    // send file
-    if (kstuff_filepath != NULL) { // kstuff only
-        if (send_file(ip, port, kstuff_filepath) == 0) {
-            printf("Sent kstuff successfully.\n");
-        } else {
-            printf("Failed to send kstuff.\n");
-            send_notification("Failed to send kstuff");
-            return 1;
-        }
-    } 
+    // Send etaHEN file
+    if (send_file(ip, port, etaHEN_filepath) == 0) {
+        printf("Sent etaHEN successfully.\n");
+    } else {
+        printf("Failed to send etaHEN.\n");
+        send_notification("Failed to send etaHEN");
+        return 1;
+    }
 
     return 0;
 }
