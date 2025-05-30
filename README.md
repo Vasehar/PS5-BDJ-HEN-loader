@@ -27,7 +27,7 @@ Clone this repository and enter it: <br>
 ```sh
 sudo apt update
 sudo apt install -y git 
-git clone https://github.com/BenNoxXD/PS5-BDJ-HEN-loader
+git clone https://github.com/Vasehar/PS5-BDJ-HEN-loader
 cd PS5-BDJ-HEN-loader
 ```
 
