@@ -26,11 +26,11 @@ const char *target_process = "SceDiscPlayer";
 const char *ip = "127.0.0.1";
 int port = 9021;
 
-const char *etaHEN_1 = "/data/etaHEN.bin";
-const char *etaHEN_2 = "/mnt/usb0/etaHEN.bin";
-const char *etaHEN_3 = "/mnt/disc/jar-payloads/etaHEN.bin";
-const char *etaHEN_filepath = NULL;
-const char *friendly_etaHEN_filepath = NULL;
+const char *kstuff_1 = "/data/kstuff.elf";
+const char *kstuff_2 = "/mnt/usb0/kstuff.elf";
+const char *kstuff_3 = "/mnt/disc/jar-payloads/kstuff.elf";
+const char *kstuff_filepath = NULL;
+const char *friendly_kstuff_filepath = NULL;
 
 typedef struct app_info {
     uint32_t app_id;
@@ -99,24 +99,24 @@ int main() {
         return 1;
     }
 
-    // Check for etaHEN.bin in the specified order
-    if (access(etaHEN_1, F_OK) == 0) {
-        etaHEN_filepath = etaHEN_1;
-        friendly_etaHEN_filepath = "/data";
-    } else if (access(etaHEN_2, F_OK) == 0) {
-        etaHEN_filepath = etaHEN_2;
-        friendly_etaHEN_filepath = "USB";
-    } else if (access(etaHEN_3, F_OK) == 0) {
-        etaHEN_filepath = etaHEN_3;
-        friendly_etaHEN_filepath = "Disc";
+    // Check for kstuff.elf in prioritized order
+    if (access(kstuff_1, F_OK) == 0) {
+        kstuff_filepath = kstuff_1;
+        friendly_kstuff_filepath = "/data";
+    } else if (access(kstuff_2, F_OK) == 0) {
+        kstuff_filepath = kstuff_2;
+        friendly_kstuff_filepath = "USB";
+    } else if (access(kstuff_3, F_OK) == 0) {
+        kstuff_filepath = kstuff_3;
+        friendly_kstuff_filepath = "Disc";
     } else {
-        send_notification("No etaHEN found - exiting");
-        printf("No etaHEN found - exiting\n");
+        send_notification("No kstuff.elf found - exiting");
+        printf("No kstuff.elf found - exiting\n");
         return 1;
     }
 
-    send_notification("etaHEN will be loaded from %s", friendly_etaHEN_filepath);
-    printf("etaHEN will be loaded from %s\n", etaHEN_filepath);
+    send_notification("kstuff will be loaded from %s", friendly_kstuff_filepath);
+    printf("kstuff will be loaded from %s\n", kstuff_filepath);
 
     printf("Attempting to kill %s...\n", target_process);
     send_notification("Attempting to kill DiscPlayer");
@@ -133,12 +133,12 @@ int main() {
     printf("Successfully killed %s\n", target_process);
     send_notification("Successfully killed DiscPlayer");
 
-    // Send etaHEN file
-    if (send_file(ip, port, etaHEN_filepath) == 0) {
-        printf("Sent etaHEN successfully.\n");
+    // Send kstuff.elf
+    if (send_file(ip, port, kstuff_filepath) == 0) {
+        printf("Sent kstuff successfully.\n");
     } else {
-        printf("Failed to send etaHEN.\n");
-        send_notification("Failed to send etaHEN");
+        printf("Failed to send kstuff.\n");
+        send_notification("Failed to send kstuff");
         return 1;
     }
 
